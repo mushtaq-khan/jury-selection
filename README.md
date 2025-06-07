@@ -1,14 +1,6 @@
-# Authentication Backend
+# Jury Selection System Backend
 
-A Node.js backend with Express.js, PostgreSQL, and Prisma ORM for handling user authentication.
-
-## Features
-
-- User registration and login
-- JWT-based authentication
-- Password reset functionality
-- Profile management
-- Email notifications for password reset
+A robust Node.js backend with Express.js, PostgreSQL, and Prisma ORM for handling jury selection and authentication.
 
 ## Prerequisites
 
@@ -16,9 +8,14 @@ A Node.js backend with Express.js, PostgreSQL, and Prisma ORM for handling user 
 - PostgreSQL database
 - npm or yarn package manager
 
-## Setup
+## Setup Requirements
 
-1. Clone the repository
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd jury-selection
+   ```
+
 2. Install dependencies:
    ```bash
    npm install
@@ -45,83 +42,21 @@ A Node.js backend with Express.js, PostgreSQL, and Prisma ORM for handling user 
    npm run dev
    ```
 
-## API Endpoints
+## Development
 
-### Authentication
+To start development:
 
-- `POST /api/auth/signup` - Register a new user
-- `POST /api/auth/login` - Login user
-- `POST /api/auth/forgot-password` - Request password reset
-- `POST /api/auth/reset-password` - Reset password
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-### Profile
+2. Start development server with hot reload:
+   ```bash
+   npm run dev
+   ```
 
-- `GET /api/auth/profile` - Get user profile (protected)
-- `PUT /api/auth/profile` - Update user profile (protected)
-
-## Request Examples
-
-### Signup
-```json
-POST /api/auth/signup
-{
-  "email": "user@example.com",
-  "password": "password123",
-  "firstName": "John",
-  "lastName": "Doe",
-  "phoneNumber": "+1234567890"
-}
-```
-
-### Login
-```json
-POST /api/auth/login
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-```
-
-### Forgot Password
-```json
-POST /api/auth/forgot-password
-{
-  "email": "user@example.com"
-}
-```
-
-### Reset Password
-```json
-POST /api/auth/reset-password
-{
-  "token": "reset-token",
-  "newPassword": "newpassword123"
-}
-```
-
-### Update Profile
-```json
-PUT /api/auth/profile
-{
-  "firstName": "John",
-  "lastName": "Doe",
-  "email": "user@example.com",
-  "phoneNumber": "+1234567890"
-}
-```
-
-## Security
-
-- Passwords are hashed using bcrypt
-- JWT tokens are used for authentication
-- Email verification for password reset
-- Protected routes using middleware
-
-## Error Handling
-
-The API includes comprehensive error handling for:
-- Invalid credentials
-- Duplicate email addresses
-- Invalid tokens
-- Database errors
-- Server errors 
+3. For production:
+   ```bash
+   npm start
+   ```
