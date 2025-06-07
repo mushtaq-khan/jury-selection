@@ -41,7 +41,6 @@ const createJuror = async (req, res) => {
           status
         } = jurorData;
 
-        // Validate required fields
         if (!jurorNumber) {
           errors.push({
             jurorNumber,
@@ -50,12 +49,11 @@ const createJuror = async (req, res) => {
           continue;
         }
 
-        // Check if TDL number is unique if provided
         if (tdlNumber) {
           const existingTDL = await prisma.juror.findFirst({
             where: { 
               tdlNumber,
-              deletedAt: null // Only check non-deleted records
+              deletedAt: null
             }
           });
 
@@ -68,7 +66,6 @@ const createJuror = async (req, res) => {
           }
         }
 
-        // Validate caseId if provided
         if (caseId) {
           const existingCase = await prisma.case.findUnique({
             where: { 
@@ -78,7 +75,7 @@ const createJuror = async (req, res) => {
             include: {
               jurors: {
                 where: {
-                  deletedAt: null // Only include non-deleted jurors
+                  deletedAt: null
                 }
               }
             }
@@ -92,14 +89,13 @@ const createJuror = async (req, res) => {
             continue;
           }
 
-          // Check if juror is already assigned to any case
           const existingJuror = await prisma.juror.findFirst({
             where: {
               jurorNumber,
               caseId: {
                 not: null
               },
-              deletedAt: null // Only check non-deleted records
+              deletedAt: null
             }
           });
 
@@ -112,7 +108,6 @@ const createJuror = async (req, res) => {
           }
         }
 
-        // Validate date format if provided
         let parsedDateOfBirth;
         if (dateOfBirth) {
           parsedDateOfBirth = new Date(dateOfBirth);
@@ -125,7 +120,6 @@ const createJuror = async (req, res) => {
           }
         }
 
-        // Validate number of children if provided
         if (numberOfChildren !== undefined && (isNaN(numberOfChildren) || numberOfChildren < 0)) {
           errors.push({
             jurorNumber,
@@ -134,7 +128,6 @@ const createJuror = async (req, res) => {
           continue;
         }
 
-        // Validate panel position if provided
         if (panelPosition !== undefined && (isNaN(panelPosition) || panelPosition < 0)) {
           errors.push({
             jurorNumber,
@@ -197,7 +190,6 @@ const createJuror = async (req, res) => {
       }
     }
 
-    // If no jurors were created successfully
     if (createdJurors.length === 0 && errors.length > 0) {
       return res.status(400).json({
         success: false,
@@ -205,7 +197,6 @@ const createJuror = async (req, res) => {
       });
     }
 
-    // If some jurors were created and some failed
     if (errors.length > 0) {
       return res.status(207).json({
         success: true,
@@ -214,7 +205,6 @@ const createJuror = async (req, res) => {
       });
     }
 
-    // If all jurors were created successfully
     res.status(201).json({
       success: true,
       data: createdJurors
@@ -229,7 +219,6 @@ const createJuror = async (req, res) => {
   }
 };
 
-// List all jurors for the authenticated user
 const listJurors = async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -278,7 +267,6 @@ const listJurors = async (req, res) => {
   }
 };
 
-// Soft delete a juror
 const deleteJuror = async (req, res) => {
   try {
     const { id } = req.params;

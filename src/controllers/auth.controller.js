@@ -5,7 +5,6 @@ const nodemailer = require('nodemailer');
 
 const prisma = new PrismaClient();
 
-// Email transporter configuration
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
@@ -19,7 +18,6 @@ const signup = async (req, res) => {
   try {
     const { email, password, firstName, lastName, phoneNumber } = req.body;
 
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -28,10 +26,8 @@ const signup = async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
     const user = await prisma.user.create({
       data: {
         email,
@@ -42,7 +38,6 @@ const signup = async (req, res) => {
       },
     });
 
-    // Generate JWT
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       process.env.JWT_SECRET,
@@ -70,7 +65,6 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find user
     const user = await prisma.user.findUnique({
       where: { email },
     });
@@ -79,13 +73,11 @@ const login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Verify password
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Generate JWT
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       process.env.JWT_SECRET,
@@ -121,14 +113,12 @@ const forgotPassword = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Generate reset token
     const resetToken = jwt.sign(
       { userId: user.id },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
-    // Send reset email
     await transporter.sendMail({
       from: process.env.SMTP_USER,
       to: email,
@@ -152,14 +142,11 @@ const resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
 
-    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.userId;
 
-    // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Update password
     await prisma.user.update({
       where: { id: userId },
       data: { password: hashedPassword },
