@@ -10,6 +10,72 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum CaseType {
+  CIVIL
+  CRIMINAL
+}
+
+enum JurorStatus {
+  ACTIVE
+  INACTIVE
+  DELETED
+  PENDING
+  REJECTED
+  SELECTED
+}
+
+model Juror {
+  id                    Int       @id @default(autoincrement())
+  jurorNumber          String    @unique
+  firstName            String?
+  lastName             String?
+  gender               String?
+  race                 String?
+  dateOfBirth          DateTime?
+  homeAddress          String?
+  mailingAddress       String?
+  tdlNumber            String?   @unique
+  homePhone            String?
+  countyOfResidence    String?
+  criminalCaseExp      Boolean   @default(false)
+  accidentalInjury     Boolean   @default(false)
+  education            String?
+  civilJuryService     Boolean   @default(false)
+  criminalJuryService  Boolean   @default(false)
+  usCitizen            Boolean   @default(false)
+  occupation           String?
+  workPhone            String?
+  maritalStatus        String?
+  spouse               String?
+  employer             String?
+  lengthOfEmployment   String?
+  numberOfChildren     Int       @default(0)
+  panelPosition        Int?
+  status               JurorStatus @default(ACTIVE)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  deletedAt            DateTime?
+  case                 Case?     @relation(fields: [caseId], references: [id])
+  caseId               Int?      // Removed @unique to allow multiple jurors per case
+  createdBy            User      @relation(fields: [userId], references: [id])
+  userId               Int       // Added to track which user created the juror
+}
+
+model Case {
+  id                    Int       @id @default(autoincrement())
+  caseNumber           String    @unique
+  caseType             CaseType
+  caseName             String?
+  description          String?
+  idealJurorTraits     String?
+  caseQuestions        String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  createdBy            User      @relation(fields: [userId], references: [id])
+  userId               Int
+  jurors               Juror[]   // Changed to array to support multiple jurors
+}
+
 model User {
   id          Int      @id @default(autoincrement())
   email       String   @unique
@@ -19,4 +85,6 @@ model User {
   phoneNumber String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  cases       Case[]
+  jurors      Juror[]  // Added to track jurors created by the user
 } 
